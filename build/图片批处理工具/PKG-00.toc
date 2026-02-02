@@ -36,6 +36,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
    'PYSOURCE'),
+  ('pyi_rth__tkinter',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
+   'PYSOURCE'),
   ('pyi_rth_inspect',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
@@ -51,10 +55,6 @@
   ('pyi_rth_multiprocessing',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_multiprocessing.py',
-   'PYSOURCE'),
-  ('pyi_rth__tkinter',
-   'D:\\projcect\\Cropping and '
-   'stitching\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
    'PYSOURCE'),
   ('image_processor',
    'D:\\projcect\\Cropping and stitching\\image_processor.py',

@@ -7,6 +7,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\AvifImagePlugin.py',
    'PYMODULE'),
+  ('PIL.BdfFontFile',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\BdfFontFile.py',
+   'PYMODULE'),
   ('PIL.BlpImagePlugin',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\BlpImagePlugin.py',
@@ -18,6 +22,10 @@
   ('PIL.BufrStubImagePlugin',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\BufrStubImagePlugin.py',
+   'PYMODULE'),
+  ('PIL.ContainerIO',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\ContainerIO.py',
    'PYMODULE'),
   ('PIL.CurImagePlugin',
    'D:\\projcect\\Cropping and '
@@ -47,6 +55,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\FliImagePlugin.py',
    'PYMODULE'),
+  ('PIL.FontFile',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\FontFile.py',
+   'PYMODULE'),
   ('PIL.FpxImagePlugin',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\FpxImagePlugin.py',
@@ -58,6 +70,10 @@
   ('PIL.GbrImagePlugin',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\GbrImagePlugin.py',
+   'PYMODULE'),
+  ('PIL.GdImageFile',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\GdImageFile.py',
    'PYMODULE'),
   ('PIL.GifImagePlugin',
    'D:\\projcect\\Cropping and '
@@ -115,6 +131,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageDraw2.py',
    'PYMODULE'),
+  ('PIL.ImageEnhance',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageEnhance.py',
+   'PYMODULE'),
   ('PIL.ImageFile',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageFile.py',
@@ -127,6 +147,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageFont.py',
    'PYMODULE'),
+  ('PIL.ImageGrab',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageGrab.py',
+   'PYMODULE'),
   ('PIL.ImageMath',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageMath.py',
@@ -134,6 +158,10 @@
   ('PIL.ImageMode',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageMode.py',
+   'PYMODULE'),
+  ('PIL.ImageMorph',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageMorph.py',
    'PYMODULE'),
   ('PIL.ImageOps',
    'D:\\projcect\\Cropping and '
@@ -159,6 +187,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageShow.py',
    'PYMODULE'),
+  ('PIL.ImageStat',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageStat.py',
+   'PYMODULE'),
   ('PIL.ImageText',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageText.py',
@@ -166,6 +198,10 @@
   ('PIL.ImageTk',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageTk.py',
+   'PYMODULE'),
+  ('PIL.ImageTransform',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\ImageTransform.py',
    'PYMODULE'),
   ('PIL.ImageWin',
    'D:\\projcect\\Cropping and '
@@ -211,6 +247,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\MspImagePlugin.py',
    'PYMODULE'),
+  ('PIL.PSDraw',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\PSDraw.py',
+   'PYMODULE'),
   ('PIL.PaletteFile',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\PaletteFile.py',
@@ -222,6 +262,10 @@
   ('PIL.PcdImagePlugin',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\PcdImagePlugin.py',
+   'PYMODULE'),
+  ('PIL.PcfFontFile',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\PcfFontFile.py',
    'PYMODULE'),
   ('PIL.PcxImagePlugin',
    'D:\\projcect\\Cropping and '
@@ -267,6 +311,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\SunImagePlugin.py',
    'PYMODULE'),
+  ('PIL.TarIO',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\TarIO.py',
+   'PYMODULE'),
   ('PIL.TgaImagePlugin',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\TgaImagePlugin.py',
@@ -278,6 +326,10 @@
   ('PIL.TiffTags',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\TiffTags.py',
+   'PYMODULE'),
+  ('PIL.WalImageFile',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\WalImageFile.py',
    'PYMODULE'),
   ('PIL.WebPImagePlugin',
    'D:\\projcect\\Cropping and '
@@ -299,6 +351,10 @@
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\XpmImagePlugin.py',
    'PYMODULE'),
+  ('PIL.__main__',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\__main__.py',
+   'PYMODULE'),
   ('PIL._binary',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\_binary.py',
@@ -306,6 +362,10 @@
   ('PIL._deprecate',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\_deprecate.py',
+   'PYMODULE'),
+  ('PIL._tkinter_finder',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\_tkinter_finder.py',
    'PYMODULE'),
   ('PIL._typing',
    'D:\\projcect\\Cropping and '
@@ -322,6 +382,10 @@
   ('PIL.features',
    'D:\\projcect\\Cropping and '
    'stitching\\.venv\\Lib\\site-packages\\PIL\\features.py',
+   'PYMODULE'),
+  ('PIL.report',
+   'D:\\projcect\\Cropping and '
+   'stitching\\.venv\\Lib\\site-packages\\PIL\\report.py',
    'PYMODULE'),
   ('__future__',
    'D:\\languageprograming\\python3.12\\Lib\\__future__.py',
@@ -1737,6 +1801,9 @@
   ('tkinter',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\__init__.py',
    'PYMODULE'),
+  ('tkinter.__main__',
+   'D:\\languageprograming\\python3.12\\Lib\\tkinter\\__main__.py',
+   'PYMODULE'),
   ('tkinter.colorchooser',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\colorchooser.py',
    'PYMODULE'),
@@ -1749,6 +1816,9 @@
   ('tkinter.dialog',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\dialog.py',
    'PYMODULE'),
+  ('tkinter.dnd',
+   'D:\\languageprograming\\python3.12\\Lib\\tkinter\\dnd.py',
+   'PYMODULE'),
   ('tkinter.filedialog',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\filedialog.py',
    'PYMODULE'),
@@ -1758,8 +1828,14 @@
   ('tkinter.messagebox',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\messagebox.py',
    'PYMODULE'),
+  ('tkinter.scrolledtext',
+   'D:\\languageprograming\\python3.12\\Lib\\tkinter\\scrolledtext.py',
+   'PYMODULE'),
   ('tkinter.simpledialog',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\simpledialog.py',
+   'PYMODULE'),
+  ('tkinter.tix',
+   'D:\\languageprograming\\python3.12\\Lib\\tkinter\\tix.py',
    'PYMODULE'),
   ('tkinter.ttk',
    'D:\\languageprograming\\python3.12\\Lib\\tkinter\\ttk.py',
