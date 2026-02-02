@@ -12,6 +12,27 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk, ImageDraw
 import customtkinter as ctk
 
+# 拖拽功能暂时禁用（与CustomTkinter存在兼容性问题）
+HAS_DND = False
+DnDCTk = ctk.CTk
+
+# 注释掉的拖拽库导入
+# try:
+#     from tkinterdnd2 import DND_FILES, TkinterDnD
+#     HAS_DND = True
+#     
+#     # 创建支持拖拽的 CTk 类
+#     class DnDCTk(ctk.CTk, TkinterDnD.Tk):
+#         def __init__(self, *args, **kwargs):
+#             # 先初始化 TkinterDnD
+#             TkinterDnD.Tk.__init__(self, *args, **kwargs)
+#             # 再应用 CTk 样式
+#             ctk.CTk.__init__(self, *args, **kwargs)
+# except Exception as e:
+#     HAS_DND = False
+#     DnDCTk = ctk.CTk
+#     print(f"提示：拖拽功能不可用 ({e})。可使用按钮添加图片。")
+
 
 class ImageProcessor:
     """图像处理逻辑类"""
@@ -118,7 +139,7 @@ class ImageProcessor:
         return out
 
 
-class ModernImageApp(ctk.CTk):
+class ModernImageApp(DnDCTk):
     """主应用程序类"""
     
     def __init__(self):
@@ -153,6 +174,9 @@ class ModernImageApp(ctk.CTk):
         self.rows_var = tk.IntVar(value=0)
         self.cols_var = tk.IntVar(value=3)
         self.stitch_mode = tk.StringVar(value="grid")
+        self.stitch_image_order = []  # 保存拼接图片的顺序列表 [(path, name), ...]
+        self.stitch_order_frames = []  # 保存拼接顺序卡片框架
+        self.selected_stitch_index = None  # 当前选中的拼接图片索引
         self.bg_color = "#FFFFFF"
         
         self.setup_ui()
@@ -233,17 +257,31 @@ class ModernImageApp(ctk.CTk):
         help_frame = ctk.CTkFrame(left_frame)
         help_frame.pack(fill="x", padx=5, pady=10)
         ctk.CTkLabel(help_frame, text="💡 提示", font=("Arial", 12, "bold")).pack(pady=5)
-        ctk.CTkLabel(help_frame, text="点击图片卡片选择\nCtrl+点击多选", font=("Arial", 10)).pack(pady=2)
+        tip_text = "点击图片卡片选择\nCtrl+点击多选"
+        if HAS_DND:
+            tip_text += "\n📎 支持拖拽图片到右侧"
+        ctk.CTkLabel(help_frame, text=tip_text, font=("Arial", 10)).pack(pady=2)
         
         # 右侧：缩略图网格视图
         right_frame = ctk.CTkFrame(self.tab_files)
         right_frame.pack(side="right", fill="both", expand=True, padx=10, pady=10)
         
-        ctk.CTkLabel(right_frame, text="图片预览（点击选择）", font=("Arial", 16, "bold")).pack(pady=10)
+        title_text = "图片预览（点击选择"
+        if HAS_DND:
+            title_text += "，支持拖拽"
+        title_text += "）"
+        ctk.CTkLabel(right_frame, text=title_text, font=("Arial", 16, "bold")).pack(pady=10)
         
         # 创建可滚动框架
         self.file_scroll_frame = ctk.CTkScrollableFrame(right_frame, width=950, height=750)
         self.file_scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # 设置拖拽区域
+        if HAS_DND:
+            try:
+                self.setup_drag_drop(right_frame)
+            except Exception as e:
+                print(f"设置拖拽功能失败: {e}")
     
     def setup_crop_tab(self):
         """裁剪选项卡"""
@@ -431,16 +469,410 @@ class ModernImageApp(ctk.CTk):
         )
         help_text.configure(state="disabled")
         
-        # 右侧：预览区域
+        # 右侧：预览区域（分为上下两部分）
         right_frame = ctk.CTkFrame(self.tab_stitch)
         right_frame.pack(side="right", fill="both", expand=True, padx=10, pady=10)
         
-        ctk.CTkLabel(right_frame, text="拼接预览", font=("Arial", 16, "bold")).pack(pady=10)
+        # 上部：图片顺序调整区域
+        order_container = ctk.CTkFrame(right_frame)
+        order_container.pack(fill="both", expand=True, padx=5, pady=(5, 5))
         
-        self.stitch_canvas = tk.Canvas(right_frame, bg="#2b2b2b", highlightthickness=0)
-        self.stitch_canvas.pack(fill="both", expand=True, padx=10, pady=10)
+        ctk.CTkLabel(order_container, text="📋 拼接顺序（拖动或使用按钮调整）", font=("Arial", 14, "bold")).pack(pady=5)
+        
+        # 图片列表和操作按钮
+        list_frame = ctk.CTkFrame(order_container)
+        list_frame.pack(fill="both", expand=True, padx=5, pady=5)
+        
+        # 左侧：图片列表（带滚动）
+        list_left = ctk.CTkFrame(list_frame)
+        list_left.pack(side="left", fill="both", expand=True)
+        
+        # 创建可滚动框架
+        self.order_canvas = tk.Canvas(list_left, bg="#2b2b2b", highlightthickness=0)
+        scrollbar = ctk.CTkScrollbar(list_left, command=self.order_canvas.yview)
+        self.order_scroll_frame = ctk.CTkFrame(self.order_canvas, fg_color="#2b2b2b")
+        
+        self.order_scroll_frame.bind(
+            "<Configure>",
+            lambda e: self.order_canvas.configure(scrollregion=self.order_canvas.bbox("all"))
+        )
+        
+        self.order_canvas.create_window((0, 0), window=self.order_scroll_frame, anchor="nw")
+        self.order_canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.order_canvas.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+        scrollbar.pack(side="left", fill="y", pady=5)
+        
+        # 鼠标滚轮支持
+        self.order_canvas.bind_all("<MouseWheel>", lambda e: self.order_canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+        
+        # 右侧：操作按钮
+        button_frame = ctk.CTkFrame(list_frame, width=100)
+        button_frame.pack(side="right", fill="y", padx=5)
+        button_frame.pack_propagate(False)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="⬆️ 上移",
+            command=self.move_image_up,
+            width=90,
+            height=35
+        ).pack(pady=5)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="⬇️ 下移",
+            command=self.move_image_down,
+            width=90,
+            height=35
+        ).pack(pady=5)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="🔝 置顶",
+            command=self.move_image_top,
+            width=90,
+            height=35
+        ).pack(pady=5)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="🔽 置底",
+            command=self.move_image_bottom,
+            width=90,
+            height=35
+        ).pack(pady=5)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="❌ 移除",
+            command=self.remove_from_stitch_list,
+            width=90,
+            height=35,
+            fg_color="#c44444",
+            hover_color="#8b0000"
+        ).pack(pady=5)
+        
+        ctk.CTkButton(
+            button_frame,
+            text="🔄 刷新列表",
+            command=self.refresh_stitch_list,
+            width=90,
+            height=35
+        ).pack(pady=(20, 5))
+        
+        # 下部：拼接预览
+        preview_container = ctk.CTkFrame(right_frame)
+        preview_container.pack(fill="both", expand=True, padx=5, pady=(0, 5))
+        
+        ctk.CTkLabel(preview_container, text="🖼️ 拼接预览", font=("Arial", 14, "bold")).pack(pady=5)
+        
+        self.stitch_canvas = tk.Canvas(preview_container, bg="#2b2b2b", highlightthickness=0)
+        self.stitch_canvas.pack(fill="both", expand=True, padx=5, pady=5)
+    
+    # ==================== 拼接顺序调整功能 ====================
+    
+    def get_image_paths_for_stitching(self):
+        """获取要拼接的图片路径列表"""
+        if self.use_selected_var.get():
+            paths = self.get_selected_files()
+            if not paths:
+                return []
+        else:
+            folder = self.folder
+            if self.use_cropped_var.get():
+                cropped_folder = os.path.join(folder, 'cropped')
+                if os.path.isdir(cropped_folder):
+                    folder = cropped_folder
+            
+            valid = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp')
+            paths = [os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(valid)]
+            paths.sort()
+        
+        return paths
+    
+    def create_stitch_order_card(self, img_path, filename, index):
+        """创建拼接顺序卡片"""
+        card = ctk.CTkFrame(self.order_scroll_frame, fg_color="#3a3a3a", corner_radius=5)
+        card.pack(fill="x", padx=5, pady=3)
+        
+        # 绑定点击事件
+        card.bind("<Button-1>", lambda e: self.select_stitch_item(index))
+        
+        # 左侧：序号和缩略图
+        left_part = ctk.CTkFrame(card, fg_color="transparent")
+        left_part.pack(side="left", fill="y", padx=5, pady=5)
+        
+        # 序号
+        num_label = ctk.CTkLabel(left_part, text=f"{index + 1}.", font=("Arial", 14, "bold"), width=30)
+        num_label.pack(side="left", padx=(0, 5))
+        num_label.bind("<Button-1>", lambda e: self.select_stitch_item(index))
+        
+        # 缩略图
+        try:
+            img = Image.open(img_path)
+            img.thumbnail((60, 60), Image.Resampling.LANCZOS)
+            photo = ctk.CTkImage(light_image=img, dark_image=img, size=(60, 60))
+            img_label = ctk.CTkLabel(left_part, image=photo, text="")
+            img_label.image = photo  # 保持引用
+            img_label.pack(side="left", padx=5)
+            img_label.bind("<Button-1>", lambda e: self.select_stitch_item(index))
+        except:
+            placeholder = ctk.CTkLabel(left_part, text="📷", font=("Arial", 30), width=60, height=60)
+            placeholder.pack(side="left", padx=5)
+            placeholder.bind("<Button-1>", lambda e: self.select_stitch_item(index))
+        
+        # 右侧：文件名
+        name_label = ctk.CTkLabel(card, text=filename, font=("Arial", 11), anchor="w")
+        name_label.pack(side="left", fill="both", expand=True, padx=5)
+        name_label.bind("<Button-1>", lambda e: self.select_stitch_item(index))
+        
+        return card
+    
+    def select_stitch_item(self, index):
+        """选中拼接列表中的项目"""
+        self.selected_stitch_index = index
+        self.update_stitch_order_display()
+    
+    def refresh_stitch_list(self):
+        """刷新拼接顺序列表"""
+        # 清空现有卡片
+        for frame in self.stitch_order_frames:
+            frame.destroy()
+        self.stitch_order_frames.clear()
+        self.stitch_image_order.clear()
+        self.selected_stitch_index = None
+        
+        # 获取要拼接的图片路径
+        source_images = self.get_image_paths_for_stitching()
+        if not source_images:
+            messagebox.showwarning("提示", "没有找到可拼接的图片")
+            return
+        
+        # 创建卡片
+        for i, img_path in enumerate(source_images):
+            filename = os.path.basename(img_path)
+            self.stitch_image_order.append((img_path, filename))
+            card = self.create_stitch_order_card(img_path, filename, i)
+            self.stitch_order_frames.append(card)
+    
+    def move_image_up(self):
+        """将选中图片上移"""
+        if self.selected_stitch_index is None:
+            return
+        
+        index = self.selected_stitch_index
+        if index == 0:
+            return  # 已经在顶部
+        
+        # 交换顺序
+        self.stitch_image_order[index], self.stitch_image_order[index - 1] = \
+            self.stitch_image_order[index - 1], self.stitch_image_order[index]
+        
+        # 更新选中索引
+        self.selected_stitch_index = index - 1
+        
+        # 更新显示
+        self.update_stitch_order_display()
+    
+    def move_image_down(self):
+        """将选中图片下移"""
+        if self.selected_stitch_index is None:
+            return
+        
+        index = self.selected_stitch_index
+        if index >= len(self.stitch_image_order) - 1:
+            return  # 已经在底部
+        
+        # 交换顺序
+        self.stitch_image_order[index], self.stitch_image_order[index + 1] = \
+            self.stitch_image_order[index + 1], self.stitch_image_order[index]
+        
+        # 更新选中索引
+        self.selected_stitch_index = index + 1
+        
+        # 更新显示
+        self.update_stitch_order_display()
+    
+    def move_image_top(self):
+        """将选中图片移到顶部"""
+        if self.selected_stitch_index is None:
+            return
+        
+        index = self.selected_stitch_index
+        if index == 0:
+            return  # 已经在顶部
+        
+        # 移到顶部
+        item = self.stitch_image_order.pop(index)
+        self.stitch_image_order.insert(0, item)
+        
+        # 更新选中索引
+        self.selected_stitch_index = 0
+        
+        # 更新显示
+        self.update_stitch_order_display()
+    
+    def move_image_bottom(self):
+        """将选中图片移到底部"""
+        if self.selected_stitch_index is None:
+            return
+        
+        index = self.selected_stitch_index
+        if index >= len(self.stitch_image_order) - 1:
+            return  # 已经在底部
+        
+        # 移到底部
+        item = self.stitch_image_order.pop(index)
+        self.stitch_image_order.append(item)
+        
+        # 更新选中索引
+        self.selected_stitch_index = len(self.stitch_image_order) - 1
+        
+        # 更新显示
+        self.update_stitch_order_display()
+    
+    def remove_from_stitch_list(self):
+        """从拼接列表中移除选中图片"""
+        if self.selected_stitch_index is None:
+            return
+        
+        index = self.selected_stitch_index
+        self.stitch_image_order.pop(index)
+        
+        # 更新选中索引
+        if self.stitch_image_order:
+            self.selected_stitch_index = min(index, len(self.stitch_image_order) - 1)
+        else:
+            self.selected_stitch_index = None
+        
+        # 更新显示
+        self.update_stitch_order_display()
+    
+    def update_stitch_order_display(self):
+        """更新拼接顺序列表显示"""
+        # 清空现有卡片
+        for frame in self.stitch_order_frames:
+            frame.destroy()
+        self.stitch_order_frames.clear()
+        
+        # 重新创建所有卡片
+        for i, (img_path, filename) in enumerate(self.stitch_image_order):
+            card = self.create_stitch_order_card(img_path, filename, i)
+            self.stitch_order_frames.append(card)
+            
+            # 高亮选中项
+            if i == self.selected_stitch_index:
+                card.configure(fg_color="#1f6aa5")
     
     # ==================== 文件管理功能 ====================
+    
+    def setup_drag_drop(self, target_frame):
+        """设置拖拽功能"""
+        if not HAS_DND:
+            return
+        
+        # 为目标框架注册拖拽事件
+        target_frame.drop_target_register(DND_FILES)
+        target_frame.dnd_bind('<<Drop>>', self.on_drop)
+        
+        # 同时为滚动框架注册
+        self.file_scroll_frame.drop_target_register(DND_FILES)
+        self.file_scroll_frame.dnd_bind('<<Drop>>', self.on_drop)
+        
+        # 拖拽悬停效果
+        target_frame.dnd_bind('<<DragEnter>>', self.on_drag_enter)
+        target_frame.dnd_bind('<<DragLeave>>', self.on_drag_leave)
+        self.file_scroll_frame.dnd_bind('<<DragEnter>>', self.on_drag_enter)
+        self.file_scroll_frame.dnd_bind('<<DragLeave>>', self.on_drag_leave)
+    
+    def on_drag_enter(self, event):
+        """拖拽进入时的视觉反馈"""
+        if hasattr(event.widget, 'configure'):
+            try:
+                event.widget.configure(border_width=2, border_color="#1f6aa5")
+            except:
+                pass
+    
+    def on_drag_leave(self, event):
+        """拖拽离开时恢复样式"""
+        if hasattr(event.widget, 'configure'):
+            try:
+                event.widget.configure(border_width=0)
+            except:
+                pass
+    
+    def on_drop(self, event):
+        """处理拖拽文件"""
+        # 恢复边框样式
+        if hasattr(event.widget, 'configure'):
+            try:
+                event.widget.configure(border_width=0)
+            except:
+                pass
+        
+        # 解析拖入的文件路径
+        files = self.parse_drop_files(event.data)
+        
+        # 过滤出图片文件
+        valid_extensions = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp', '.gif')
+        new_files = []
+        
+        for file_path in files:
+            if os.path.isfile(file_path):
+                # 检查是否是图片文件
+                if file_path.lower().endswith(valid_extensions):
+                    if file_path not in self.files:
+                        new_files.append(file_path)
+            elif os.path.isdir(file_path):
+                # 如果是文件夹，加载其中的所有图片
+                try:
+                    dir_files = [os.path.join(file_path, f) for f in os.listdir(file_path) 
+                                 if f.lower().endswith(valid_extensions)]
+                    for f in dir_files:
+                        if f not in self.files:
+                            new_files.append(f)
+                except Exception as e:
+                    print(f"读取文件夹错误: {e}")
+        
+        if new_files:
+            # 添加新文件
+            self.files.extend(new_files)
+            
+            # 刷新显示
+            self.refresh_file_grid()
+            self.update_stats()
+            
+            # 显示提示
+            messagebox.showinfo("成功", f"已添加 {len(new_files)} 张图片")
+        else:
+            messagebox.showwarning("提示", "没有找到新的图片文件")
+    
+    def parse_drop_files(self, data):
+        """解析拖拽的文件路径"""
+        # Windows 系统路径格式处理
+        if data.startswith('{'):
+            # 处理包含空格的路径：{path1} {path2}
+            files = []
+            current = ""
+            in_braces = False
+            
+            for char in data:
+                if char == '{':
+                    in_braces = True
+                    current = ""
+                elif char == '}':
+                    in_braces = False
+                    if current:
+                        files.append(current)
+                    current = ""
+                elif in_braces:
+                    current += char
+            
+            return files
+        else:
+            # 简单的空格分隔路径
+            return data.split()
     
     def choose_folder(self):
         """选择文件夹"""
@@ -944,7 +1376,24 @@ class ModernImageApp(ctk.CTk):
     
     def generate_stitch_preview(self):
         """生成拼接预览"""
-        images = self.get_stitch_images()
+        # 如果用户还没有刷新列表，自动刷新
+        if not self.stitch_image_order:
+            self.refresh_stitch_list()
+        
+        # 使用用户调整后的顺序
+        if not self.stitch_image_order:
+            messagebox.showwarning("提示", "没有可拼接的图片")
+            return
+        
+        # 从顺序列表获取图片路径
+        image_paths = [path for path, _ in self.stitch_image_order]
+        
+        try:
+            images = [Image.open(p).convert('RGB') for p in image_paths]
+        except Exception as e:
+            messagebox.showerror("错误", f"加载图片失败：{e}")
+            return
+        
         if not images:
             return
         
@@ -1000,26 +1449,60 @@ class ModernImageApp(ctk.CTk):
     
     def export_stitch_image(self):
         """导出拼接图片"""
-        if not hasattr(self, 'stitch_result') or self.stitch_result is None:
-            messagebox.showwarning("警告", "请先生成预览")
+        # 如果用户还没有刷新列表，自动刷新
+        if not self.stitch_image_order:
+            self.refresh_stitch_list()
+        
+        if not self.stitch_image_order:
+            messagebox.showwarning("提示", "没有可拼接的图片")
             return
         
-        out_dir = os.path.join(self.folder, 'stitched')
-        os.makedirs(out_dir, exist_ok=True)
+        # 从顺序列表获取图片路径
+        image_paths = [path for path, _ in self.stitch_image_order]
         
-        save_path = filedialog.asksaveasfilename(
-            defaultextension='.jpg',
-            filetypes=[('JPEG', '*.jpg'), ('PNG', '*.png')],
-            initialfile='stitched.jpg',
-            initialdir=out_dir
-        )
+        try:
+            images = [Image.open(p).convert('RGB') for p in image_paths]
+        except Exception as e:
+            messagebox.showerror("错误", f"加载图片失败：{e}")
+            return
         
-        if save_path:
-            try:
-                self.stitch_result.save(save_path, quality=95)
-                messagebox.showinfo("完成", f"图片已保存到：\n{save_path}")
-            except Exception as e:
-                messagebox.showerror("错误", f"保存失败：{e}")
+        if not images:
+            return
+        
+        try:
+            # 解析背景颜色
+            bg_color = tuple(int(self.bg_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+            
+            spacing = self.spacing_var.get()
+            mode = self.stitch_mode.get()
+            
+            # 生成高清拼接图
+            if mode == "grid":
+                rows = self.rows_var.get()
+                cols = self.cols_var.get()
+                result = ImageProcessor.stitch_images_grid(images, rows, cols, spacing, bg_color)
+            elif mode == "horizontal":
+                result = ImageProcessor.stitch_images_horizontal(images, spacing, bg_color)
+            else:
+                result = ImageProcessor.stitch_images_vertical(images, spacing, bg_color)
+            
+            if result:
+                # 保存文件
+                out_dir = os.path.join(self.folder, 'stitched')
+                os.makedirs(out_dir, exist_ok=True)
+                
+                save_path = filedialog.asksaveasfilename(
+                    defaultextension='.jpg',
+                    filetypes=[('JPEG', '*.jpg'), ('PNG', '*.png')],
+                    initialfile='stitched.jpg',
+                    initialdir=out_dir
+                )
+                
+                if save_path:
+                    result.save(save_path, quality=95)
+                    messagebox.showinfo("完成", f"图片已保存到：\n{save_path}")
+        except Exception as e:
+            messagebox.showerror("错误", f"导出失败：{e}")
 
 
 def main():

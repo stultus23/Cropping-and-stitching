@@ -1,4 +1,4 @@
-# 现代化图片批处理工具依赖项
+# 图片批处理工具依赖项
 # Python 3.8+ 推荐
 
 # 图像处理库
@@ -10,3 +10,5 @@ customtkinter>=5.2.0
 # CustomTkinter 的依赖
 darkdetect>=0.8.0
 packaging>=23.0
+# 拖拽功能支持
+tkinterdnd2>=0.3.0
