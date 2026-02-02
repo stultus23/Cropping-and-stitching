@@ -1,6 +1,6 @@
 # 🎨 图片批处理工具
 
-一款功能强大、界面现代的桌面端图片批处理软件，支持批量裁剪和智能拼接。
+一款功能一般、界面原始的桌面端图片批处理软件，支持批量裁剪和拼接。
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![CustomTkinter](https://img.shields.io/badge/CustomTkinter-5.2+-green.svg)
@@ -177,13 +177,6 @@ python image_processor.py
 - [ ] 多线程处理
 - [ ] 内存使用优化
 
-### 高级功能
-- [ ] 图片滤镜效果
-- [ ] 水印添加
-- [ ] 批量压缩
-- [ ] 格式转换
-- [ ] EXIF 信息查看/编辑
-
 ---
 
 ## 📄 许可证
@@ -194,4 +187,4 @@ MIT License
 
 ## 👨‍💻 作者
 
-GitHub Copilot (2026-01-20)
+GitHub Copilot & stultus23 (2026-01-20)
